@@ -32,7 +32,7 @@ const Home = () => {
     <main className="app-shell">
       <header className="chat-header">
         <div className="logo-wrap">
-          <Image src={f1gpt} alt="F1GPT" width={48} height={48} priority />
+          <Image src={f1gpt} alt="F1GPT" width={72} height={72} priority />
         </div>
         <p className="tagline">Ask anything about Formula 1</p>
       </header>

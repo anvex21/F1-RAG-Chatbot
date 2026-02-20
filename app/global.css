@@ -90,8 +90,8 @@ body {
 }
 
 .chat-header .tagline {
-  margin: 0.25rem 0 0;
-  font-size: 0.8125rem;
+  margin: 0.35rem 0 0;
+  font-size: 1.0625rem;
   color: var(--text-secondary);
   font-weight: 500;
 }
