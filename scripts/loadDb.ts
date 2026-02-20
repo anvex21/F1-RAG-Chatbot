@@ -52,21 +52,37 @@ const createCollection = async (
 
 const loadData = async () => {
   const collection = await db.collection(ASTRA_DB_COLLECTION);
-  for await (const url of f1Data) {
-    const content = await scrapePage(url);
-    const chunks = await splitter.splitText(content);
-    for await (const chunk of chunks) {
-      const embedding = await openai.embeddings.create({
+  
+  for (const url of f1Data) {
+    console.log(`Scraping and processing: ${url}`);
+    try {
+      const content = await scrapePage(url);
+      const chunks = await splitter.splitText(content);
+
+      // --- BATCH EMBEDDING ---
+      const embeddingResponse = await openai.embeddings.create({
         model: "text-embedding-3-small",
-        input: chunk,
+        input: chunks, // OpenAI accepts the whole array here
         encoding_format: "float",
       });
-      const vector = embedding.data[0].embedding;
-      const res = await collection.insertOne({
-        $vector: vector,
+
+      // Map the embeddings back to your document format
+      const documents = chunks.map((chunk, i) => ({
+        $vector: embeddingResponse.data[i].embedding,
         text: chunk,
-      });
-      console.log("Inserted chunk: ", res);
+        metadata: { url } 
+      }));
+
+      // --- BATCH INSERT ---
+      const res = await collection.insertMany(documents);
+      console.log(`Inserted ${res.insertedCount} chunks from ${url}`);
+
+      // --- THROTTLING ---
+      // Add a 1-second pause between pages to stay safe
+      await new Promise(r => setTimeout(r, 1000));
+
+    } catch (err) {
+      console.error(`Failed to process ${url}:`, err);
     }
   }
 };
