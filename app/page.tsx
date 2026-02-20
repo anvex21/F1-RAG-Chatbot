@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import f1gpt from "./assets/f1gpt.png";
 import { useChat } from "@ai-sdk/react";
@@ -13,8 +13,20 @@ const Home = () => {
     transport: new DefaultChatTransport({ api: "/api/chat" }),
   });
   const [input, setInput] = useState("");
+  const chatContentRef = useRef<HTMLElement>(null);
   const isLoading = status === "streaming" || status === "submitted";
   const noMessages = !messages || messages.length === 0;
+
+  useEffect(() => {
+    if (chatContentRef.current) {
+      setTimeout(() => {
+        chatContentRef.current?.scrollTo({
+          top: chatContentRef.current.scrollHeight,
+          behavior: "smooth",
+        });
+      }, 0);
+    }
+  }, [messages, isLoading]);
 
   const handlePrompt = (promptText: string) => {
     sendMessage({ text: promptText });
@@ -38,6 +50,7 @@ const Home = () => {
       </header>
 
       <section
+        ref={chatContentRef}
         className={`chat-content ${noMessages ? "empty" : ""}`}
         aria-label="Chat messages"
       >
@@ -86,7 +99,14 @@ const Home = () => {
 
 function SendIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M22 2L11 13" />
       <path d="M22 2L15 22L11 13L2 9L22 2Z" />
     </svg>
