@@ -58,7 +58,8 @@ body {
   max-height: 820px;
   display: flex;
   flex-direction: column;
-  background: var(--bg-card);
+  /* Slightly brighter so red/black logo is visible, still dark */
+  background: #1c1c24;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow), var(--shadow-glow);
